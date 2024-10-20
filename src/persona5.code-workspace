@@ -1,0 +1,40 @@
+{
+  "folders": [
+	{
+		"path": "../../sublime/persona5"
+	},
+	{
+		"path": "../../sublime/nav"
+	},
+	{
+		"path": "../../sublime/map"
+	},
+	{
+		"path": "../../tones"
+	},
+	{
+		"path": "../../ts/ai-video"
+	},
+	{
+		"path": "../../magenta"
+	},
+	{
+		"path": "../../music"
+	},
+	{
+		"path": "../../datakraft"
+	},
+	{
+		"path": "../../sublime/portal"
+	},
+	{
+		"path": ".."
+	},
+	{
+		"path": "../../map-server"
+	}
+],
+  "settings": {
+    "liveServer.settings.multiRootWorkspaceName": "magenta"
+  }
+}
