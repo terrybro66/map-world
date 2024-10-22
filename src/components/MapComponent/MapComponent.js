@@ -12,8 +12,6 @@ const MapComponent = ({
   maskData, // Default to sample data if maskData is not provided
   onViewStateChange,
 }) => {
-  const [visibleFeatures, setVisibleFeatures] = useState(new Set());
-
   const scatterplotLayer = new ScatterplotLayer({
     id: "scatterplot-layer",
     data,
@@ -51,9 +49,7 @@ const MapComponent = ({
       shininess: 32,
       specularColor: [51, 51, 51],
     },
-    updateTriggers: {
-      getElevation: visibleFeatures,
-    },
+
     extensions: [new MaskExtension({ maskByInstance: false })],
 
     maskId: "mask-layer",
@@ -72,36 +68,30 @@ const MapComponent = ({
       return null;
     }
 
-    // Check for multiple name variations
-    const name =
-      object["name:en"] ||
-      object.name ||
-      object["name:fr"] ||
-      object["name:es"] ||
-      "Unknown";
-
     return {
       html: `
         <div class="${styles.bname}">
-          Value: ${name}
+          ${object.name}
         </div>
       `,
     };
   };
 
   return (
-    <DeckGL
-      initialViewState={initialViewState}
-      controller={true}
-      layers={[scatterplotLayer, polygonLayer, maskLayer]}
-      onViewStateChange={onViewStateChange}
-      getTooltip={getTooltip}
-    >
-      <Map
-        mapStyle="mapbox://styles/mapbox/dark-v11"
-        mapboxAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
-      />
-    </DeckGL>
+    <div className={styles.container}>
+      <DeckGL
+        initialViewState={initialViewState}
+        controller={true}
+        layers={[scatterplotLayer, polygonLayer, maskLayer]}
+        onViewStateChange={onViewStateChange}
+        getTooltip={getTooltip}
+      >
+        <Map
+          mapStyle="mapbox://styles/mapbox/dark-v11"
+          mapboxAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
+        />
+      </DeckGL>
+    </div>
   );
 };
 

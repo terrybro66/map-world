@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
-import "./App.css";
-import MapComponent from "./components/MapComponent";
+import React, { useState, useEffect, useCallback } from "react";
+import MapComponent from "./components/MapComponent/MapComponent";
 import initialViewState from "./initialViewState";
 import { generateCirclePolygon } from "./utils/generateMask";
+import styles from "./App.module.css";
+import ViewModePanel from "./components/ViewModePanel/ViewModePanel";
 
 function App() {
   const [data, setData] = useState([]);
@@ -16,7 +17,10 @@ function App() {
 
     const buildings = data.features.map((feature) => {
       const coordinates = feature.geometry.coordinates[0];
-      const name = feature.properties.name || "Unknown"; // Extract the name property, default to 'Unknown' if not present
+      const name =
+        feature.properties?.["name:en"] ||
+        feature.properties?.["name"] ||
+        "Unknown"; // Safely access the name property, default to 'Unknown' if not present
       const height = feature.properties["building:levels"]
         ? parseInt(feature.properties["building:levels"], 10) * 3
         : 10; // 10 meters or 3 meters per level
@@ -68,12 +72,18 @@ function App() {
     console.log("Mask Data:", [{ polygon }]);
   }, [viewState]);
 
-  const handleViewStateChange = ({ viewState }) => {
+  const handleViewStateChange = useCallback(({ viewState }) => {
     setViewState(viewState);
-  };
+  }, []);
 
+  const changePitch = useCallback(() => {
+    setViewState((prevState) => ({
+      ...prevState,
+      pitch: prevState.pitch === 0 ? 60 : 0,
+    }));
+  }, []);
   return (
-    <div className="App">
+    <div className={styles.container}>
       <MapComponent
         initialViewState={viewState}
         data={data}
@@ -81,6 +91,9 @@ function App() {
         maskData={maskData}
         onViewStateChange={handleViewStateChange}
       />
+      <div>
+        <ViewModePanel changePitch={changePitch} viewState={viewState} />
+      </div>
     </div>
   );
 }
