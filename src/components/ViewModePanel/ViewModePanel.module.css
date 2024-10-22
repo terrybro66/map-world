@@ -1,10 +1,10 @@
 .control-panel {
   position: absolute;
-  top: 10px; /* Adjust as needed */
-  right: 10px; /* Adjust as needed */
+  top: 20px; /* Adjust as needed */
+  right: 20px; /* Adjust as needed */
   z-index: 1000; /* Ensure it's above the map */
   background: white; /* Optional: Add background for better visibility */
-  padding: 10px; /* Optional: Add padding */
+  padding: 8px; /* Optional: Add padding */
   border-radius: 5px; /* Optional: Add border radius */
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Optional: Add shadow */
 }
@@ -13,12 +13,22 @@
   background-color: #007bff; /* Button background color */
   color: white; /* Button text color */
   border: none; /* Remove border */
-  padding: 10px 20px; /* Button padding */
+  width: 50px; /* Fixed width */
+  height: 50px; /* Fixed height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 5px; /* Button border radius */
   cursor: pointer; /* Pointer cursor on hover */
-  font-size: 16px; /* Button font size */
+  font-size: 22px; /* Button font size */
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: width 0.3s ease-in-out, height 0.3s ease-in-out,
+    font-size 0.3s ease-in-out; /* Add transition for font size */
 }
 
 .control-panel button:hover {
+  font-size: 28px;
   background-color: #0056b3; /* Button background color on hover */
 }

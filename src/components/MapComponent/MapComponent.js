@@ -68,18 +68,10 @@ const MapComponent = ({
       return null;
     }
 
-    // Check for multiple name variations
-    const name =
-      object["name:en"] ||
-      object.name ||
-      object["name:fr"] ||
-      object["name:es"] ||
-      "Unknown";
-
     return {
       html: `
         <div class="${styles.bname}">
-          Value: ${name}
+          ${object.name}
         </div>
       `,
     };

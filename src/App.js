@@ -17,7 +17,10 @@ function App() {
 
     const buildings = data.features.map((feature) => {
       const coordinates = feature.geometry.coordinates[0];
-      const name = feature.properties.name || "Unknown"; // Extract the name property, default to 'Unknown' if not present
+      const name =
+        feature.properties?.["name:en"] ||
+        feature.properties?.["name"] ||
+        "Unknown"; // Safely access the name property, default to 'Unknown' if not present
       const height = feature.properties["building:levels"]
         ? parseInt(feature.properties["building:levels"], 10) * 3
         : 10; // 10 meters or 3 meters per level
