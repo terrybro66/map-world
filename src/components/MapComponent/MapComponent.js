@@ -85,6 +85,7 @@ const MapComponent = ({
         layers={[scatterplotLayer, polygonLayer, maskLayer]}
         onViewStateChange={onViewStateChange}
         getTooltip={getTooltip}
+        className={styles["container"]}
       >
         <Map
           mapStyle="mapbox://styles/mapbox/dark-v11"
