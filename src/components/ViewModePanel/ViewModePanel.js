@@ -1,9 +1,14 @@
 import React from "react";
 import styles from "./ViewModePanel.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCube, faSquare } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCube,
+  faSquare,
+  faMagnifyingGlassPlus,
+  faMagnifyingGlassMinus,
+} from "@fortawesome/free-solid-svg-icons";
 
-const ViewModePanel = ({ changePitch, viewState }) => {
+const ViewModePanel = ({ changePitch, changeZoom, viewState }) => {
   const isPlanView = viewState.pitch === 0;
   const nextMode = isPlanView ? "perspective view" : "plan view";
 
@@ -15,6 +20,20 @@ const ViewModePanel = ({ changePitch, viewState }) => {
         title={`Change to ${nextMode}`}
       >
         <FontAwesomeIcon icon={isPlanView ? faSquare : faCube} />
+      </button>
+      <button
+        onClick={() => changeZoom(2)} // Wrap in an anonymous function
+        aria-label="Zoom in"
+        title="Zoom in"
+      >
+        <FontAwesomeIcon icon={faMagnifyingGlassPlus} />
+      </button>
+      <button
+        onClick={() => changeZoom(-2)} // Wrap in an anonymous function
+        aria-label="Zoom out"
+        title="Zoom out"
+      >
+        <FontAwesomeIcon icon={faMagnifyingGlassMinus} />
       </button>
     </div>
   );
