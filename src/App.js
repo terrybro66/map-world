@@ -106,6 +106,17 @@ function App() {
     }));
   }, []);
 
+  const rotateView = useCallback((direction) => {
+    setViewState((prevState) => ({
+      ...prevState,
+      bearing: prevState.bearing + direction,
+      transitionInterpolator: new FlyToInterpolator({
+        speed: 1.5,
+      }),
+      transitionDuration: 300, // 1 second transition
+    }));
+  }, []);
+
   return (
     <div className={styles.container}>
       <MapComponent
@@ -120,6 +131,7 @@ function App() {
           changePitch={changePitch}
           changeZoom={changeZoom}
           viewState={viewState}
+          rotateView={rotateView}
         />
       </div>
     </div>
