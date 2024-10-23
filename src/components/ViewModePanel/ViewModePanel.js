@@ -6,9 +6,11 @@ import {
   faSquare,
   faMagnifyingGlassPlus,
   faMagnifyingGlassMinus,
+  faRotateRight,
+  faRotateLeft,
 } from "@fortawesome/free-solid-svg-icons";
 
-const ViewModePanel = ({ changePitch, changeZoom, viewState }) => {
+const ViewModePanel = ({ changePitch, changeZoom, rotateView, viewState }) => {
   const isPlanView = viewState.pitch === 0;
   const nextMode = isPlanView ? "perspective view" : "plan view";
 
@@ -35,8 +37,20 @@ const ViewModePanel = ({ changePitch, changeZoom, viewState }) => {
       >
         <FontAwesomeIcon icon={faMagnifyingGlassMinus} />
       </button>
+      <button
+        onClick={() => rotateView(15)} // Wrap in an anonymous function
+      >
+        <FontAwesomeIcon icon={faRotateLeft} />
+      </button>
+      <button
+        onClick={() => rotateView(-15)} // Wrap in an anonymous function
+      >
+        <FontAwesomeIcon icon={faRotateRight} />
+      </button>
     </div>
   );
 };
+
+<FontAwesomeIcon icon={faRotateRight} />;
 
 export default ViewModePanel;
