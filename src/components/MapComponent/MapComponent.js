@@ -12,12 +12,15 @@ const MapComponent = ({
   maskData, // Default to sample data if maskData is not provided
   onViewStateChange,
 }) => {
+  const elevationOffset = 100; // Adjust this value to your desired height
+
   const scatterplotLayer = new ScatterplotLayer({
     id: "scatterplot-layer",
     data,
-    getPosition: (d) => d.coordinates,
-    getFillColor: [255, 140, 0],
-    getRadius: 100,
+    getPosition: (d) => [...d.coordinates, elevationOffset], // Add z-axis (elevation)
+    getFillColor: [255, 140, 0, 200],
+    getLineColor: [0, 0, 0, 255],
+    getRadius: 50,
     pickable: true,
     radiusScale: 10,
     radiusMinPixels: 5,
