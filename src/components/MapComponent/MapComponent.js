@@ -1,7 +1,12 @@
 // src/components/MapComponent.js
 import React, { useState } from "react";
 import { Map } from "react-map-gl";
-import { DeckGL, ScatterplotLayer, PolygonLayer } from "deck.gl";
+import {
+  DeckGL,
+  ScatterplotLayer,
+  PolygonLayer,
+  ScenegraphLayer,
+} from "deck.gl";
 import { MaskExtension } from "@deck.gl/extensions";
 import styles from "./MapComponent.module.css";
 
@@ -66,6 +71,24 @@ const MapComponent = ({
     operation: "mask",
   });
 
+  const scenegraphLayer = new ScenegraphLayer({
+    id: "scenegraph-layer",
+    data: [
+      {
+        position: [initialViewState.longitude, initialViewState.latitude],
+        scale: 10,
+        orientation: [0, 0, 0], // You could move orientation to data object
+      },
+    ],
+    scenegraph: process.env.PUBLIC_URL + "/Soldier.glb",
+    getPosition: (d) => d.position,
+    getOrientation: (d) => d.orientation, // Make it dynamic per object
+    getScale: (d) => [d.scale, d.scale, d.scale],
+    sizeScale: 1000,
+    _lighting: "pbr",
+    pickable: true,
+  });
+
   const getTooltip = ({ object }) => {
     if (!object) {
       return null;
@@ -85,7 +108,7 @@ const MapComponent = ({
       <DeckGL
         initialViewState={initialViewState}
         controller={true}
-        layers={[scatterplotLayer, polygonLayer, maskLayer]}
+        layers={[scatterplotLayer, polygonLayer, maskLayer, scenegraphLayer]}
         onViewStateChange={onViewStateChange}
         getTooltip={getTooltip}
         className={styles["container"]}
