@@ -3,6 +3,19 @@
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  margin: 0;
-  padding: 0;
+}
+.controlPanelContainer {
+  position: absolute;
+  top: 20px; /* Adjust as needed */
+  left: 20px; /* Adjust as needed */
+  display: flex;
+
+  gap: 10px; /* Add space between items */
+  z-index: 1000; /* Ensure it's above the map */
+  width: 100%;
+}
+
+.searchBox {
+  width: 200px; /* Fixed width */
+  align-self: flex-end; /* Align the SearchBox to the right */
 }

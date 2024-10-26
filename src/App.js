@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { FlyToInterpolator } from "@deck.gl/core";
-
+import SearchBox from "./components/SearchBox/SearchBox";
 import MapComponent from "./components/MapComponent/MapComponent";
 import initialViewState from "./initialViewState";
 import { generateCirclePolygon } from "./utils/generateMask";
@@ -146,6 +146,17 @@ function App() {
     });
   }, []);
 
+  const handleFlyTo = (poi) => {
+    setViewState({
+      ...viewState,
+      longitude: poi.coordinates[0],
+      latitude: poi.coordinates[1],
+      zoom: 15,
+      transitionInterpolator: new FlyToInterpolator(),
+      transitionDuration: 1500,
+    });
+  };
+
   return (
     <div className={styles.container}>
       <MapComponent
@@ -155,7 +166,7 @@ function App() {
         maskData={maskData}
         onViewStateChange={handleViewStateChange}
       />
-      <div>
+      <div className={styles.controlPanelContainer}>
         <ViewModePanel
           changePitch={changePitch}
           changeZoom={changeZoom}
@@ -163,6 +174,8 @@ function App() {
           rotateView={rotateView}
           move={move}
         />
+
+        <SearchBox pointsOfInterest={data} flyTo={handleFlyTo} />
       </div>
     </div>
   );

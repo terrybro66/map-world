@@ -1,9 +1,5 @@
 .control-panel {
-  position: absolute;
   display: flex;
-  top: 20px; /* Adjust as needed */
-  left: 20px; /* Adjust as needed */
-  z-index: 1000; /* Ensure it's above the map */
   background: #ff8c00; /* Optional: Add background for better visibility */
   padding: 8px; /* Optional: Add padding */
   border-radius: 5px; /* Optional: Add border radius */
@@ -16,12 +12,12 @@
   border: none; /* Remove border */
   width: 50px; /* Fixed width */
   height: 50px; /* Fixed height */
-  display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 5px; /* Button border radius */
   cursor: pointer; /* Pointer cursor on hover */
   font-size: 22px; /* Button font size */
+  font-weight: bold;
   position: relative;
   overflow: hidden;
   cursor: pointer;
@@ -30,7 +26,6 @@
 }
 
 .control-panel button:hover {
-  font-size: 28px;
   background-color: #0056b3; /* Button background color on hover */
 }
 
