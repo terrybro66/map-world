@@ -116,6 +116,35 @@ function App() {
       transitionDuration: 300, // 1 second transition
     }));
   }, []);
+  const move = useCallback((direction) => {
+    setViewState((prevState) => {
+      // Base distance in degrees (approximately 500 meters at equator)
+      const distance = 0.005 * direction;
+
+      // Convert angles to radians
+      const bearingRad = (prevState.bearing * Math.PI) / 180;
+      const pitchRad = (prevState.pitch * Math.PI) / 180;
+
+      // Calculate the ground distance (accounting for pitch)
+      const groundDistance = distance * Math.cos(pitchRad);
+
+      // Calculate new coordinates
+      const newLongitude =
+        prevState.longitude + groundDistance * Math.sin(bearingRad);
+      const newLatitude =
+        prevState.latitude + groundDistance * Math.cos(bearingRad);
+
+      return {
+        ...prevState,
+        longitude: newLongitude,
+        latitude: newLatitude,
+        // Only use transition properties if you want smooth animation
+        transitionDuration: 1000,
+        transitionInterpolator: new FlyToInterpolator(),
+        transitionEasing: (t) => t * (2 - t), // Ease out function for smoother motion
+      };
+    });
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -132,6 +161,7 @@ function App() {
           changeZoom={changeZoom}
           viewState={viewState}
           rotateView={rotateView}
+          move={move}
         />
       </div>
     </div>

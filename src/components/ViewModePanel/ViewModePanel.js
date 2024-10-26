@@ -8,16 +8,24 @@ import {
   faMagnifyingGlassMinus,
   faRotateRight,
   faRotateLeft,
+  faArrowUp,
+  faArrowDown,
 } from "@fortawesome/free-solid-svg-icons";
 
-const ViewModePanel = ({ changePitch, changeZoom, rotateView, viewState }) => {
+const ViewModePanel = ({
+  changePitch,
+  changeZoom,
+  rotateView,
+  move,
+  viewState,
+}) => {
   const isPlanView = viewState.pitch === 0;
   const nextMode = isPlanView ? "perspective view" : "plan view";
 
   return (
     <div className={styles["control-panel"]}>
       <button
-        onClick={changePitch}
+        onClick={() => changePitch()}
         aria-label={`Change to ${nextMode}`}
         title={`Change to ${nextMode}`}
       >
@@ -46,6 +54,20 @@ const ViewModePanel = ({ changePitch, changeZoom, rotateView, viewState }) => {
         onClick={() => rotateView(-15)} // Wrap in an anonymous function
       >
         <FontAwesomeIcon icon={faRotateRight} />
+      </button>
+      <button
+        onClick={() => move(1)} // Wrap in an anonymous function
+        aria-label="Move forward"
+        title="Move forward"
+      >
+        <FontAwesomeIcon icon={faArrowUp} />
+      </button>
+      <button
+        onClick={() => move(-1)} // Wrap in an anonymous function
+        aria-label="Move backward"
+        title="Move backward"
+      >
+        <FontAwesomeIcon icon={faArrowDown} />
       </button>
     </div>
   );
