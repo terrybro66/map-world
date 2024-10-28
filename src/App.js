@@ -43,9 +43,9 @@ function App() {
 
   const fetchPOIs = useCallback(async () => {
     try {
-      const response = await fetch(
-        "https://map-server-kp0k.onrender.com/api/pos"
-      );
+      const apiUrl = process.env.REACT_APP_API_URL;
+
+      const response = await fetch(apiUrl + "/api/pos");
       const result = await response.json();
       const formattedData = result.map((poi) => {
         const [longitude, latitude] = poi.location
