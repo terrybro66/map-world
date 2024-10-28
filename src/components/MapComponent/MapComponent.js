@@ -1,14 +1,16 @@
 // src/components/MapComponent.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Map } from "react-map-gl";
 import {
   DeckGL,
   ScatterplotLayer,
   PolygonLayer,
   ScenegraphLayer,
+  IconLayer,
 } from "deck.gl";
 import { MaskExtension } from "@deck.gl/extensions";
 import styles from "./MapComponent.module.css";
+import MarkerModal from "../MarkerModal/MarkerModal";
 
 const MapComponent = ({
   initialViewState,
@@ -19,11 +21,24 @@ const MapComponent = ({
 }) => {
   const elevationOffset = 100; // Adjust this value to your desired height
 
+  const [markers, setMarkers] = useState(() => {
+    // Load markers from localStorage if they exist
+    const savedMarkers = localStorage.getItem("markers");
+    return savedMarkers ? JSON.parse(savedMarkers) : [];
+  });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newMarker, setNewMarker] = useState(null);
+
+  useEffect(() => {
+    // Save markers to localStorage whenever they change
+    localStorage.setItem("markers", JSON.stringify(markers));
+  }, [markers]);
+
   const scatterplotLayer = new ScatterplotLayer({
     id: "scatterplot-layer",
     data,
     getPosition: (d) => [...d.coordinates, elevationOffset], // Add z-axis (elevation)
-    getFillColor: [255, 140, 0, 200],
+    getFillColor: [255, 140, 0, 160],
     getLineColor: [0, 0, 0, 255],
     getRadius: 50,
     pickable: true,
@@ -89,6 +104,26 @@ const MapComponent = ({
     pickable: true,
   });
 
+  const iconLayer = new IconLayer({
+    id: "icon-layer",
+    data: markers,
+    getPosition: (d) => [d.longitude, d.latitude, d.elevation || 100],
+    getIcon: (d) => ({
+      url: process.env.PUBLIC_URL + "/map-icon.png",
+      width: 128,
+      height: 128,
+      anchorY: 128,
+    }),
+    sizeScale: 85,
+    pickable: true,
+  });
+
+  const clearMarkers = () => {
+    setMarkers([]);
+  };
+
+  window.clearMarkers = clearMarkers;
+
   const getTooltip = ({ object }) => {
     if (!object) {
       return null;
@@ -96,11 +131,55 @@ const MapComponent = ({
 
     return {
       html: `
-        <div class="${styles.bname}">
-          ${object.name}
+              <div class="${styles.bname}">
+          <strong>${object.name}</strong><br/>
+          ${
+            object.imageUrl
+              ? `<img src="${object.imageUrl}" alt="${object.name}" style="max-width: 200px; max-height: 200px;"/>`
+              : ""
+          }
         </div>
       `,
     };
+  };
+
+  const handleMapClick = (event) => {
+    console.log(event.coordinate);
+    const [longitude, latitude] = event.coordinate;
+    setNewMarker({ longitude, latitude });
+    setIsModalOpen(true);
+  };
+
+  const handleSaveMarker = ({ name, elevation, image }) => {
+    const reader = new FileReader();
+    reader.onload = (upload) => {
+      const imageUrl = upload.target.result;
+      setMarkers((prevMarkers) => [
+        ...prevMarkers,
+        {
+          id: Date.now(),
+          longitude: newMarker.longitude,
+          latitude: newMarker.latitude,
+          elevation,
+          name,
+          imageUrl,
+        },
+      ]);
+    };
+    if (image) {
+      reader.readAsDataURL(image);
+    } else {
+      setMarkers((prevMarkers) => [
+        ...prevMarkers,
+        {
+          id: Date.now(),
+          longitude: newMarker.longitude,
+          latitude: newMarker.latitude,
+          elevation,
+          name,
+        },
+      ]);
+    }
   };
 
   return (
@@ -108,7 +187,14 @@ const MapComponent = ({
       <DeckGL
         initialViewState={initialViewState}
         controller={true}
-        layers={[scatterplotLayer, polygonLayer, maskLayer, scenegraphLayer]}
+        layers={[
+          scatterplotLayer,
+          polygonLayer,
+          maskLayer,
+          scenegraphLayer,
+          iconLayer,
+        ]}
+        onClick={handleMapClick}
         onViewStateChange={onViewStateChange}
         getTooltip={getTooltip}
         className={styles["container"]}
@@ -118,6 +204,11 @@ const MapComponent = ({
           mapboxAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
         />
       </DeckGL>
+      <MarkerModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSaveMarker}
+      />
     </div>
   );
 };
