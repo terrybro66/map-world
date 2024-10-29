@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { FlyToInterpolator } from "@deck.gl/core";
+import { Canvas } from "@react-three/fiber";
+import { FlyToInterpolator, WebMercatorViewport } from "@deck.gl/core";
 import SearchBox from "./components/SearchBox/SearchBox";
 import MapComponent from "./components/MapComponent/MapComponent";
+import Character from "./components/Character/Character";
+import Godzilla from "./components/Godzilla/Godzilla";
 import initialViewState from "./initialViewState";
 import { generateCirclePolygon } from "./utils/generateMask";
 import styles from "./App.module.css";
@@ -12,6 +15,11 @@ function App() {
   const [buildings, setBuildings] = useState([]);
   const [viewState, setViewState] = useState(initialViewState);
   const [maskData, setMaskData] = useState([]);
+  const [isMoving, setIsMoving] = useState(false);
+  const [selectedAnimation, setSelectedAnimation] = useState("idle"); // State variable to track selected animation
+
+  const [moveCount, setMoveCount] = useState(0); // State variable to track move function calls
+  const [direction, setDirection] = useState(0); // State variable to track direction
 
   const fetchBuildings = useCallback(async () => {
     try {
@@ -117,6 +125,7 @@ function App() {
     }));
   }, []);
   const move = useCallback((direction) => {
+    setDirection(direction); // Update direction state
     setViewState((prevState) => {
       // Base distance in degrees (approximately 500 meters at equator)
       const distance = 0.005 * direction;
@@ -144,6 +153,7 @@ function App() {
         transitionEasing: (t) => t * (2 - t), // Ease out function for smoother motion
       };
     });
+    setMoveCount((count) => count + 1); // Increment move count
   }, []);
 
   const handleFlyTo = (poi) => {
@@ -157,15 +167,53 @@ function App() {
     });
   };
 
+  const modelGeoPosition = {
+    longitude: -122.45,
+    latitude: 37.78,
+    height: 100, // Height above ground in meters
+  };
+
+  // Convert geographical coordinates to world coordinates
+  const convertGeoToWorld = (longitude, latitude, height) => {
+    const viewport = new WebMercatorViewport(viewState);
+    const [x, y] = viewport.projectFlat([longitude, latitude]);
+    return [x, y, height]; // Use the height as the z-coordinate
+  };
+
+  const modelPosition = convertGeoToWorld(
+    modelGeoPosition.longitude,
+    modelGeoPosition.latitude,
+    modelGeoPosition.height
+  );
+
   return (
     <div className={styles.container}>
+      <Canvas
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          pointerEvents: "none",
+          zIndex: 10,
+        }}
+        camera={{ fov: 10, position: [0, 0, 10] }}
+      >
+        <ambientLight />
+        <directionalLight position={[10, 10, 5]} intensity={1} />
+        <Character
+          deckViewState={viewState}
+          position={modelPosition}
+          moveCount={moveCount}
+          direction={direction} // Pass direction to Character component
+        />
+      </Canvas>
       <MapComponent
         initialViewState={viewState}
         data={data}
         buildings={buildings}
         maskData={maskData}
         onViewStateChange={handleViewStateChange}
-      />
+      ></MapComponent>
       <div className={styles.controlPanelContainer}>
         <ViewModePanel
           changePitch={changePitch}

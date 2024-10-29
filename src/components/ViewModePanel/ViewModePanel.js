@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import styles from "./ViewModePanel.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -22,6 +22,18 @@ const ViewModePanel = ({
   const isPlanView = viewState.pitch === 0;
   const nextMode = isPlanView ? "perspective view" : "plan view";
 
+  const moveIntervalRef = useRef(null);
+
+  const handleMouseDown = (direction) => {
+    move(direction); // Initial move
+    moveIntervalRef.current = setInterval(() => {
+      move(direction);
+    }, 100); // Adjust the interval as needed
+  };
+
+  const handleMouseUp = () => {
+    clearInterval(moveIntervalRef.current);
+  };
   return (
     <div className={styles["control-panel"]}>
       <button
@@ -56,14 +68,18 @@ const ViewModePanel = ({
         <FontAwesomeIcon icon={faRotateRight} />
       </button>
       <button
-        onClick={() => move(1)} // Wrap in an anonymous function
+        onMouseDown={() => handleMouseDown(1)}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
         aria-label="Move forward"
         title="Move forward"
       >
         <FontAwesomeIcon icon={faArrowUp} />
       </button>
       <button
-        onClick={() => move(-1)} // Wrap in an anonymous function
+        onMouseDown={() => handleMouseDown(-1)}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
         aria-label="Move backward"
         title="Move backward"
       >

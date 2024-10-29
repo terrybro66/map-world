@@ -1,24 +1,30 @@
 .searchBox {
-  position: relative;
+  display: flex;
+  background: #ff8c00; /* Optional: Add background for better visibility */
+  padding: 8px; /* Optional: Add padding */
+  border-radius: 5px; /* Optional: Add border radius */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Optional: Add shadow */
 }
 .searchBox input {
-  padding: 8px;
-  font-size: 16px;
+  font-family: "Barriecito", sans-serif;
+  color: #28059b;
+  padding: 0px 12px;
+  font-size: 26px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
 
 .poiContainer {
   position: absolute;
-  top: 40px; /* Adjust based on the height of the input field */
-  left: 0;
-  width: 100%;
+  top: 80px; /* Adjust based on the height of the input field */
+  left: 440px;
+  width: 30%;
   background-color: white; /* Background color for the container */
-  border: 1px solid #ccc; /* Border for the container */
+  border: 0; /* Border for the container */
   border-radius: 4px; /* Rounded corners */
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Shadow for the container */
   z-index: 1000; /* Ensure it's above other elements */
-  max-height: 200px; /* Maximum height for the container */
+  max-height: 400px; /* Maximum height for the container */
   overflow-y: auto; /* Scroll if content overflows */
 }
 
@@ -36,7 +42,10 @@
 .poiList li button {
   background: none;
   border: none;
-  color: #007bff;
+  font-family: "Barriecito", sans-serif;
+  color: #28059b;
+  padding: 0px 12px;
+  font-size: 18px;
   text-align: left;
   width: 100%;
   padding: 8px;

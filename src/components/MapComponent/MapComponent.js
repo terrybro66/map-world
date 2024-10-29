@@ -1,4 +1,3 @@
-// src/components/MapComponent.js
 import React, { useState, useEffect } from "react";
 import { Map } from "react-map-gl";
 import {
@@ -20,6 +19,7 @@ const MapComponent = ({
   onViewStateChange,
 }) => {
   const elevationOffset = 100; // Adjust this value to your desired height
+  const buildingAdjustment = 1.3; // Adjust this value to your desired height
 
   const [markers, setMarkers] = useState(() => {
     // Load markers from localStorage if they exist
@@ -35,7 +35,7 @@ const MapComponent = ({
   }, [markers]);
 
   const scatterplotLayer = new ScatterplotLayer({
-    id: "scatterplot-layer",
+    id: "POIs",
     data,
     getPosition: (d) => [...d.coordinates, elevationOffset], // Add z-axis (elevation)
     getFillColor: [255, 140, 0, 160],
@@ -48,14 +48,14 @@ const MapComponent = ({
   });
 
   const polygonLayer = new PolygonLayer({
-    id: "polygon-layer",
+    id: "Buildings",
     data: buildings,
     extruded: true, // This is crucial for 3D extrusion
     getPolygon: (d) => d.polygon,
     getFillColor: [0, 0, 255, 100],
     getLineColor: [0, 0, 0, 255],
 
-    getElevation: (d) => d.height,
+    getElevation: (d) => d.height * buildingAdjustment,
     pickable: true,
     autoHighlight: true,
     wireframe: true, // This will show the edges of the polygons
@@ -84,24 +84,6 @@ const MapComponent = ({
     getPolygon: (d) => d.polygon,
     getFillColor: [0, 0, 0, 255],
     operation: "mask",
-  });
-
-  const scenegraphLayer = new ScenegraphLayer({
-    id: "scenegraph-layer",
-    data: [
-      {
-        position: [initialViewState.longitude, initialViewState.latitude],
-        scale: 10,
-        orientation: [0, 0, 0], // You could move orientation to data object
-      },
-    ],
-    scenegraph: process.env.PUBLIC_URL + "/Soldier.glb",
-    getPosition: (d) => d.position,
-    getOrientation: (d) => d.orientation, // Make it dynamic per object
-    getScale: (d) => [d.scale, d.scale, d.scale],
-    sizeScale: 1000,
-    _lighting: "pbr",
-    pickable: true,
   });
 
   const iconLayer = new IconLayer({
@@ -187,13 +169,7 @@ const MapComponent = ({
       <DeckGL
         initialViewState={initialViewState}
         controller={true}
-        layers={[
-          scatterplotLayer,
-          polygonLayer,
-          maskLayer,
-          scenegraphLayer,
-          iconLayer,
-        ]}
+        layers={[scatterplotLayer, polygonLayer, maskLayer, iconLayer]}
         onClick={handleMapClick}
         onViewStateChange={onViewStateChange}
         getTooltip={getTooltip}
