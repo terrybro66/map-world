@@ -18,6 +18,7 @@ const ViewModePanel = ({
   rotateView,
   move,
   viewState,
+  setIsMoving, // Add setIsMoving prop
 }) => {
   const isPlanView = viewState.pitch === 0;
   const nextMode = isPlanView ? "perspective view" : "plan view";
@@ -25,6 +26,7 @@ const ViewModePanel = ({
   const moveIntervalRef = useRef(null);
 
   const handleMouseDown = (direction) => {
+    setIsMoving(true);
     move(direction); // Initial move
     moveIntervalRef.current = setInterval(() => {
       move(direction);
@@ -32,6 +34,7 @@ const ViewModePanel = ({
   };
 
   const handleMouseUp = () => {
+    setIsMoving(false); // Stop moving
     clearInterval(moveIntervalRef.current);
   };
   return (
