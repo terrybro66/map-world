@@ -9,6 +9,7 @@ import initialViewState from "./initialViewState";
 import { generateCirclePolygon } from "./utils/generateMask";
 import styles from "./App.module.css";
 import ViewModePanel from "./components/ViewModePanel/ViewModePanel";
+import Logo from "./components/Logo/Logo";
 
 function App() {
   const [data, setData] = useState([]);
@@ -205,6 +206,7 @@ function App() {
           position={modelPosition}
           moveCount={moveCount}
           direction={direction} // Pass direction to Character component
+          isMoving={isMoving} // Pass isMoving to Character component
         />
       </Canvas>
       <MapComponent
@@ -215,12 +217,14 @@ function App() {
         onViewStateChange={handleViewStateChange}
       ></MapComponent>
       <div className={styles.controlPanelContainer}>
+        <Logo />
         <ViewModePanel
           changePitch={changePitch}
           changeZoom={changeZoom}
           viewState={viewState}
           rotateView={rotateView}
           move={move}
+          setIsMoving={setIsMoving} // Pass setIsMoving to ViewModePanel
         />
 
         <SearchBox pointsOfInterest={data} flyTo={handleFlyTo} />

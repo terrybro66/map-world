@@ -1,0 +1,15 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.logo {
+  width: 100px; /* Adjust the size as needed */
+  height: 100px; /* Adjust the size as needed */
+  background-image: url("/public/icon0.png"); /* Corrected path */
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}

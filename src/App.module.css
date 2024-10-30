@@ -9,7 +9,7 @@
   top: 20px; /* Adjust as needed */
   left: 20px; /* Adjust as needed */
   display: flex;
-
+  max-height: 70px;
   gap: 10px; /* Add space between items */
   z-index: 1000; /* Ensure it's above the map */
   width: 100%;

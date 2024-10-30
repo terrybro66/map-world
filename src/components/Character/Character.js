@@ -9,37 +9,36 @@ const Character = ({
   position,
   moveCount,
   direction,
-  selectedAnimation,
+  isMoving,
 }) => {
   const gltf = useLoader(GLTFLoader, "/Soldier.glb");
-  const runFbx = useLoader(FBXLoader, "/Jog.fbx"); // Load the run animation
+  const jogFbx = useLoader(FBXLoader, "/Jog.fbx"); // Load the jog animation
   const mixerRef = useRef();
   const modelRef = useRef();
   const [actions, setActions] = useState({});
 
   useEffect(() => {
-    if (gltf.animations.length) {
+    if (gltf.animations.length && jogFbx.animations.length) {
       const mixer = new AnimationMixer(gltf.scene);
-      const initialAction = mixer.clipAction(gltf.animations[0]);
-      initialAction.play();
+      const idleAction = mixer.clipAction(gltf.animations[0]); // Use the idle animation from the GLB model
+      idleAction.play();
       mixerRef.current = mixer;
 
-      const runAction = mixer.clipAction(runFbx.animations[0]);
+      const jogAction = mixer.clipAction(jogFbx.animations[0]);
 
-      setActions({ runAction });
+      setActions({ idleAction, jogAction });
     }
-  }, [gltf, runFbx, position]);
+  }, [gltf, jogFbx, position]);
 
   useEffect(() => {
-    if (actions[selectedAnimation]) {
-      Object.values(actions).forEach((action) => action.stop());
-      actions[selectedAnimation].reset().fadeIn(0.5).play();
+    if (isMoving && actions.jogAction) {
+      actions.idleAction.fadeOut(0.5);
+      actions.jogAction.reset().fadeIn(0.5).play();
+    } else if (!isMoving && actions.idleAction) {
+      actions.jogAction.fadeOut(0.5);
+      actions.idleAction.reset().fadeIn(0.5).play();
     }
-  }, [selectedAnimation, actions]);
-
-  useEffect(() => {
-    console.log("ViewState changed:", deckViewState);
-  }, [deckViewState]);
+  }, [isMoving, actions]);
 
   useEffect(() => {
     if (modelRef.current) {
