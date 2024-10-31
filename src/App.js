@@ -4,57 +4,51 @@ import { FlyToInterpolator, WebMercatorViewport } from "@deck.gl/core";
 import SearchBox from "./components/SearchBox/SearchBox";
 import MapComponent from "./components/MapComponent/MapComponent";
 import Character from "./components/Character/Character";
-import Godzilla from "./components/Godzilla/Godzilla";
 import initialViewState from "./initialViewState";
 import { generateCirclePolygon } from "./utils/generateMask";
 import styles from "./App.module.css";
 import ViewModePanel from "./components/ViewModePanel/ViewModePanel";
 import Logo from "./components/Logo/Logo";
+import GameSettings from "./components/GameSettings/GameSettings";
 
-function App() {
+const App = () => {
+  // State variables
   const [data, setData] = useState([]);
   const [buildings, setBuildings] = useState([]);
   const [viewState, setViewState] = useState(initialViewState);
   const [maskData, setMaskData] = useState([]);
   const [isMoving, setIsMoving] = useState(false);
-  const [selectedAnimation, setSelectedAnimation] = useState("idle"); // State variable to track selected animation
+  const [moveCount, setMoveCount] = useState(0);
+  const [direction, setDirection] = useState(0);
+  const [markers, setMarkers] = useState([]);
 
-  const [moveCount, setMoveCount] = useState(0); // State variable to track move function calls
-  const [direction, setDirection] = useState(0); // State variable to track direction
-
+  // Fetch buildings data
   const fetchBuildings = useCallback(async () => {
     try {
       const response = await fetch("/buildings-main.geojson");
       const data = await response.json();
-
       const buildings = data.features.map((feature) => {
         const coordinates = feature.geometry.coordinates[0];
         const name =
           feature.properties?.["name:en"] ||
           feature.properties?.["name"] ||
-          "Unknown"; // Safely access the name property, default to 'Unknown' if not present
+          "Unknown";
         const height = feature.properties["building:levels"]
           ? parseInt(feature.properties["building:levels"], 10) * 3
-          : 10; // 10 meters or 3 meters per level
-
-        return {
-          name,
-          polygon: coordinates,
-          height,
-        };
+          : 10;
+        return { name, polygon: coordinates, height };
       });
-
       setBuildings(buildings);
     } catch (error) {
       console.error("Error fetching buildings:", error);
     }
   }, []);
 
+  // Fetch points of interest (POIs) data
   const fetchPOIs = useCallback(async () => {
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
-
-      const response = await fetch(apiUrl + "/api/pos");
+      const response = await fetch(`${apiUrl}/api/pos`);
       const result = await response.json();
       const formattedData = result.map((poi) => {
         const [longitude, latitude] = poi.location
@@ -72,11 +66,13 @@ function App() {
     }
   }, []);
 
+  // Fetch data on component mount
   useEffect(() => {
     fetchPOIs();
     fetchBuildings();
   }, [fetchPOIs, fetchBuildings]);
 
+  // Memoize mask data
   const maskDataMemo = useMemo(() => {
     const polygon = generateCirclePolygon(
       viewState.longitude,
@@ -86,77 +82,116 @@ function App() {
     return [{ polygon }];
   }, [viewState]);
 
+  // Update mask data when memoized data changes
   useEffect(() => {
     setMaskData(maskDataMemo);
   }, [maskDataMemo]);
 
+  // load markers from local storage
+  useEffect(() => {
+    const savedMarkers = localStorage.getItem("mapMarkers");
+    // if (savedMarkers) {
+    //   const parsedMarkers = JSON.parse(savedMarkers);
+    //   setMarkers(parsedMarkers);
+
+    //   if (parsedMarkers.length > 0) {
+    //     const lastMarker = parsedMarkers[parsedMarkers.length - 1];
+    //     setViewState((prev) => ({
+    //       ...prev,
+    //       longitude: lastMarker.position[0],
+    //       latitude: lastMarker.position[1],
+    //     }));
+    //   }
+    // }
+  }, []);
+
+  const generateMarkerId = () => {
+    return `marker-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  };
+
+  const deleteMarker = (markerId) => {
+    setMarkers((prevMarkers) => prevMarkers.filter((m) => m.id !== markerId));
+  };
+
+  // Add a new marker at the center of the current view
+  const addMarker = () => {
+    const newMarker = {
+      id: generateMarkerId(),
+      position: [viewState.longitude, viewState.latitude, 40],
+      name: `Marker ${markers.length + 1}`,
+      size: 225,
+    };
+    setMarkers((prevMarkers) => {
+      const updatedMarkers = [...prevMarkers, newMarker];
+      localStorage.setItem("mapMarkers", JSON.stringify(updatedMarkers)); // Save to local storage
+      return updatedMarkers;
+    });
+  };
+
+  // Handle view state changes
   const handleViewStateChange = useCallback(({ viewState }) => {
     setViewState(viewState);
   }, []);
 
+  // Change pitch of the view
   const changePitch = useCallback(() => {
     setViewState((prevState) => ({
       ...prevState,
       pitch: prevState.pitch === 0 ? 60 : 0,
-      transitionInterpolator: new FlyToInterpolator({ speed: 1.5 }), // Smooth pitch change with FlyToInterpolator
-      transitionDuration: 1000, // 1 second transition
+      transitionInterpolator: new FlyToInterpolator({ speed: 1.5 }),
+      transitionDuration: 1000,
     }));
   }, []);
 
-  const customEase = (t) => t * t * (3 - 2 * t); // Custom easeInOut
+  // Custom easing function
+  const customEase = (t) => t * t * (3 - 2 * t);
 
+  // Change zoom level
   const changeZoom = useCallback((direction) => {
     setViewState((prevState) => ({
       ...prevState,
       zoom: prevState.zoom + direction,
       transitionInterpolator: new FlyToInterpolator({ speed: 2.5 }),
       transitionDuration: 800,
-      transitionEasing: customEase, // Apply custom easing
+      transitionEasing: customEase,
     }));
   }, []);
 
+  // Rotate the view
   const rotateView = useCallback((direction) => {
     setViewState((prevState) => ({
       ...prevState,
-      bearing: prevState.bearing + direction,
-      transitionInterpolator: new FlyToInterpolator({
-        speed: 1.5,
-      }),
-      transitionDuration: 300, // 1 second transition
+      bearing: prevState.bearing - direction,
+      transitionInterpolator: new FlyToInterpolator({ speed: 2.0 }),
+      transitionDuration: 300,
     }));
   }, []);
-  const move = useCallback((direction) => {
-    setDirection(direction); // Update direction state
-    setViewState((prevState) => {
-      // Base distance in degrees (approximately 500 meters at equator)
-      const distance = 0.005 * direction;
 
-      // Convert angles to radians
+  // Move the view in a specified direction
+  const move = useCallback((direction) => {
+    setDirection(direction);
+    setViewState((prevState) => {
+      const distance = 0.005 * direction;
       const bearingRad = (prevState.bearing * Math.PI) / 180;
       const pitchRad = (prevState.pitch * Math.PI) / 180;
-
-      // Calculate the ground distance (accounting for pitch)
       const groundDistance = distance * Math.cos(pitchRad);
-
-      // Calculate new coordinates
       const newLongitude =
         prevState.longitude + groundDistance * Math.sin(bearingRad);
       const newLatitude =
         prevState.latitude + groundDistance * Math.cos(bearingRad);
-
       return {
         ...prevState,
         longitude: newLongitude,
         latitude: newLatitude,
-        // Only use transition properties if you want smooth animation
         transitionDuration: 1000,
         transitionInterpolator: new FlyToInterpolator(),
-        transitionEasing: (t) => t * (2 - t), // Ease out function for smoother motion
+        transitionEasing: (t) => t * (2 - t),
       };
     });
-    setMoveCount((count) => count + 1); // Increment move count
+    setMoveCount((count) => count + 1);
   }, []);
 
+  // Fly to a specific point of interest (POI)
   const handleFlyTo = (poi) => {
     setViewState({
       ...viewState,
@@ -164,21 +199,18 @@ function App() {
       latitude: poi.coordinates[1],
       zoom: 15,
       transitionInterpolator: new FlyToInterpolator(),
-      transitionDuration: 1500,
+      transitionDuration: 2000,
     });
   };
 
-  const modelGeoPosition = {
-    longitude: -122.45,
-    latitude: 37.78,
-    height: 100, // Height above ground in meters
-  };
+  // Model geographical position
+  const modelGeoPosition = { longitude: -122.45, latitude: 37.78, height: 100 };
 
   // Convert geographical coordinates to world coordinates
   const convertGeoToWorld = (longitude, latitude, height) => {
     const viewport = new WebMercatorViewport(viewState);
     const [x, y] = viewport.projectFlat([longitude, latitude]);
-    return [x, y, height]; // Use the height as the z-coordinate
+    return [x, y, height];
   };
 
   const modelPosition = convertGeoToWorld(
@@ -205,17 +237,20 @@ function App() {
           deckViewState={viewState}
           position={modelPosition}
           moveCount={moveCount}
-          direction={direction} // Pass direction to Character component
-          isMoving={isMoving} // Pass isMoving to Character component
+          direction={direction}
+          isMoving={isMoving}
         />
       </Canvas>
+
       <MapComponent
         initialViewState={viewState}
+        viewState={viewState}
         data={data}
         buildings={buildings}
         maskData={maskData}
         onViewStateChange={handleViewStateChange}
-      ></MapComponent>
+        markers={markers}
+      />
       <div className={styles.controlPanelContainer}>
         <Logo />
         <ViewModePanel
@@ -224,13 +259,13 @@ function App() {
           viewState={viewState}
           rotateView={rotateView}
           move={move}
-          setIsMoving={setIsMoving} // Pass setIsMoving to ViewModePanel
+          setIsMoving={setIsMoving}
         />
-
         <SearchBox pointsOfInterest={data} flyTo={handleFlyTo} />
+        <GameSettings addMarker={addMarker} />
       </div>
     </div>
   );
-}
+};
 
 export default App;

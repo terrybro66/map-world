@@ -7,4 +7,5 @@
   margin: 0;
   padding: 0;
   transition: transform 0.5s ease-in-out, zoom 0.5s ease-in-out;
+  cursor: pointer; /* Ensure cursor is a pointer when over the map container */
 }
