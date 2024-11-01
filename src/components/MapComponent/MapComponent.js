@@ -12,13 +12,9 @@ const MapComponent = ({
   maskData, // Default to sample data if maskData is not provided
   onViewStateChange,
   markers,
-  selectedMarker,
-  setSelectedMarker,
-  dragStart,
-  drag,
-  dragEnd,
+  openEditModal,
 }) => {
-  const elevationOffset = 100; // Adjust this value to your desired height
+  const elevationOffset = 0; // Adjust this value to your desired height
   const buildingAdjustment = 1.3; // Adjust this value to your desired height
 
   const scatterplotLayer = new ScatterplotLayer({
@@ -81,10 +77,12 @@ const MapComponent = ({
     return Math.max(10, 20 - viewState.zoom); // Example scaling logic
   };
 
-  const scatterLayer2 = new IconLayer({
+  const markerLayer = new IconLayer({
     id: "icon-layer",
     data: markers,
     pickable: true,
+    interactive: false, // Disable default hover behavior
+
     iconAtlas: ICON_URL, // URL to the icon image
     iconMapping,
     getIcon: () => "marker",
@@ -92,28 +90,10 @@ const MapComponent = ({
     getSize: () => getIconSize(), // Use size specified in data
     sizeScale: 10, // Scale factor, adjust as needed
     onClick: (info) => {
-      setSelectedMarker(info.object); // Pass the entire marker object
+      openEditModal(info.object); // Pass the entire marker object
     },
   });
 
-  const getTooltip = ({ object }) => {
-    if (!object) {
-      return null;
-    }
-
-    return {
-      html: `
-              <div class="${styles.bname}">
-          <strong>${object.name}</strong><br/>
-          ${
-            object.imageUrl
-              ? `<img src="${object.imageUrl}" alt="${object.name}" style="max-width: 200px; max-height: 200px;"/>`
-              : ""
-          }
-        </div>
-      `,
-    };
-  };
   const getCursor = () => {
     return "pointer";
   };
@@ -130,10 +110,9 @@ const MapComponent = ({
           doubleClickZoom: false,
           touchRotate: false,
         }}
-        layers={[scatterplotLayer, polygonLayer, maskLayer, scatterLayer2]}
+        layers={[scatterplotLayer, polygonLayer, maskLayer, markerLayer]}
         onViewStateChange={onViewStateChange}
         getCursor={getCursor}
-        getTooltip={getTooltip}
         className={styles["container"]}
       >
         <Map

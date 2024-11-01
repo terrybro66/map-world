@@ -1,59 +1,56 @@
-import React, { useState, useEffect } from "react";
+// Modal.js
+import React, { useRef } from "react";
 import styles from "./Modal.module.css";
 
-const Modal = ({ onClose, onSave, onDelete, content }) => {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+const Modal = ({ onClose, onSave, isEditing, markerData, onDelete }) => {
+  const nameRef = useRef();
+  const descriptionRef = useRef();
+  const idRef = useRef();
 
-  useEffect(() => {
-    if (content) {
-      setName(content.name);
-      setDescription(content.description);
-      setImageUrl(content.imageUrl);
-    }
-  }, [content]);
+  // Populate form fields if editing
+  const initialName = isEditing ? markerData.name : "";
+  const initialDescription = isEditing ? markerData.description : "";
+  const markerId = isEditing ? markerData.id : "";
 
   const handleSave = () => {
-    onSave(content.id, name, description, imageUrl);
+    const name = nameRef.current.value;
+    const description = descriptionRef.current.value;
+    const id = idRef.current ? idRef.current.value : null;
+    onSave(name, description, id);
   };
 
   const handleDelete = () => {
-    onDelete(content.id);
+    const id = idRef.current ? idRef.current.value : null;
+    onDelete(id);
   };
 
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
-        <h2>{content ? "Edit Marker Details" : "Add Marker Details"}</h2>
-        <label>
-          Name:
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </label>
-        <label>
-          Description:
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </label>
-        <label>
-          Image URL:
-          <input
-            type="text"
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-          />
-        </label>
-        {imageUrl && <img src={imageUrl} alt={name} className={styles.image} />}
+        <h2>{isEditing ? "Edit Marker" : "Create New Marker"}</h2>
+        <form>
+          <label>
+            Name:
+            <input type="text" defaultValue={initialName} ref={nameRef} />
+          </label>
+          <label>
+            Description:
+            <input
+              type="text"
+              defaultValue={initialDescription}
+              ref={descriptionRef}
+            />
+          </label>
+          {isEditing && (
+            <input type="hidden" defaultValue={markerId} ref={idRef} />
+          )}
+        </form>
         <div className={styles.modalActions}>
-          <button onClick={handleSave}>Save</button>
-          {content && <button onClick={handleDelete}>Delete</button>}
-          <button onClick={onClose}>Close</button>
+          <button onClick={handleSave}>
+            {isEditing ? "Update" : "Create"}
+          </button>
+          <button onClick={onClose}>Cancel</button>
+          {isEditing && <button onClick={handleDelete}>Delete</button>}
         </div>
       </div>
     </div>

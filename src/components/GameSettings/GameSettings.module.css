@@ -8,6 +8,7 @@
 
 .control-panel button {
   background-color: #ff8c00; /* Button background color */
+  padding: 0;
   color: #fff; /* Button text color */
   border: none; /* Remove border */
   width: 50px; /* Fixed width */
@@ -16,7 +17,7 @@
   justify-content: center;
   border-radius: 5px; /* Button border radius */
   cursor: pointer; /* Pointer cursor on hover */
-  font-size: 22px; /* Button font size */
+  font-size: 11px; /* Button font size */
   font-weight: bold;
   position: relative;
   overflow: hidden;

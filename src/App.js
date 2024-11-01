@@ -10,6 +10,7 @@ import styles from "./App.module.css";
 import ViewModePanel from "./components/ViewModePanel/ViewModePanel";
 import Logo from "./components/Logo/Logo";
 import GameSettings from "./components/GameSettings/GameSettings";
+import Modal from "./components/Modal/Modal";
 
 const App = () => {
   // State variables
@@ -21,7 +22,9 @@ const App = () => {
   const [moveCount, setMoveCount] = useState(0);
   const [direction, setDirection] = useState(0);
   const [markers, setMarkers] = useState([]);
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editMarker, setEditMarker] = useState(null); // Marker being edited, if any
+  const [loaded, setLoaded] = useState(false);
   // Fetch buildings data
   const fetchBuildings = useCallback(async () => {
     try {
@@ -87,45 +90,86 @@ const App = () => {
     setMaskData(maskDataMemo);
   }, [maskDataMemo]);
 
-  // load markers from local storage
-  useEffect(() => {
-    const savedMarkers = localStorage.getItem("mapMarkers");
-    // if (savedMarkers) {
-    //   const parsedMarkers = JSON.parse(savedMarkers);
-    //   setMarkers(parsedMarkers);
+  const deleteMarker = (markerId) => {
+    setMarkers((prevMarkers) => {
+      return prevMarkers.filter((m) => m.id !== markerId);
+    });
+    closeModal();
+  };
 
-    //   if (parsedMarkers.length > 0) {
-    //     const lastMarker = parsedMarkers[parsedMarkers.length - 1];
-    //     setViewState((prev) => ({
-    //       ...prev,
-    //       longitude: lastMarker.position[0],
-    //       latitude: lastMarker.position[1],
-    //     }));
-    //   }
-    // }
+  // Load markers from local storage on mount
+  useEffect(() => {
+    const savedMarkers = localStorage.getItem("markers");
+    console.log("Saved Markers from Local Storage:", savedMarkers); // Debugging log
+    if (savedMarkers) {
+      try {
+        const parsedMarkers = JSON.parse(savedMarkers);
+        setMarkers(parsedMarkers);
+      } catch (error) {
+        console.error("Error parsing saved markers:", error);
+      }
+    }
+    setLoaded(true); // Mark as loaded
   }, []);
 
+  // Save markers to local storage when markersArray changes
+  useEffect(() => {
+    if (loaded) {
+      localStorage.setItem("markers", JSON.stringify(markers));
+      console.log("Markers saved to Local Storage:", markers); // Debugging log
+    }
+  }, [markers, loaded]);
+
+  // Open modal for creating a new marker
+  const openCreateModal = () => {
+    setEditMarker(null); // Not editing any existing marker
+    setIsModalOpen(true);
+  };
+
+  // Open modal for editing an existing marker
+  const openEditModal = (marker) => {
+    setEditMarker(marker); // Store reference to marker being edited
+    setIsModalOpen(true);
+  };
+
+  // Close modal
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditMarker(null);
+  };
+
   const generateMarkerId = () => {
-    return `marker-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const timestamp = Date.now().toString(36); // Convert timestamp to base-36 string
+    const randomString = Math.random().toString(36).substr(2, 9); // Generate a random string
+    return `${timestamp}-${randomString}`; // Combine the two parts
   };
 
-  const deleteMarker = (markerId) => {
-    setMarkers((prevMarkers) => prevMarkers.filter((m) => m.id !== markerId));
-  };
-
-  // Add a new marker at the center of the current view
-  const addMarker = () => {
+  // Add a new marker
+  const addMarker = (name, description) => {
     const newMarker = {
-      id: generateMarkerId(),
-      position: [viewState.longitude, viewState.latitude, 40],
-      name: `Marker ${markers.length + 1}`,
-      size: 225,
+      id: generateMarkerId(), // Use the new ID generator
+      name: name || "Default Name",
+      description: description || "Default Description",
+      position: [viewState.longitude, viewState.latitude],
     };
-    setMarkers((prevMarkers) => {
-      const updatedMarkers = [...prevMarkers, newMarker];
-      localStorage.setItem("mapMarkers", JSON.stringify(updatedMarkers)); // Save to local storage
-      return updatedMarkers;
-    });
+    setMarkers([...markers, newMarker]);
+    closeModal();
+  };
+
+  // Update an existing marker
+  const updateMarker = (name, description) => {
+    setMarkers(
+      markers.map((marker) =>
+        marker.id === editMarker.id
+          ? {
+              ...marker,
+              name: name || "Default Name",
+              description: description || "Default Description",
+            }
+          : marker
+      )
+    );
+    closeModal();
   };
 
   // Handle view state changes
@@ -250,6 +294,7 @@ const App = () => {
         maskData={maskData}
         onViewStateChange={handleViewStateChange}
         markers={markers}
+        openEditModal={openEditModal}
       />
       <div className={styles.controlPanelContainer}>
         <Logo />
@@ -262,7 +307,22 @@ const App = () => {
           setIsMoving={setIsMoving}
         />
         <SearchBox pointsOfInterest={data} flyTo={handleFlyTo} />
-        <GameSettings addMarker={addMarker} />
+        <GameSettings openModal={openCreateModal} />
+        {isModalOpen && (
+          <Modal
+            onClose={closeModal}
+            onDelete={deleteMarker}
+            onSave={(name, description) =>
+              editMarker
+                ? updateMarker(name, description)
+                : addMarker(name, description, [
+                    /*default coordinates*/
+                  ])
+            }
+            isEditing={!!editMarker}
+            markerData={editMarker} // Pass existing marker data if editing
+          />
+        )}
       </div>
     </div>
   );
