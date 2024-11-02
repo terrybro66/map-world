@@ -1,15 +1,10 @@
 .container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-}
-
-.logo {
-  width: 100px; /* Adjust the size as needed */
-  height: 100px; /* Adjust the size as needed */
-  background-image: url("/public/icon0.png"); /* Corrected path */
-  background-size: contain;
-  background-repeat: no-repeat;
+  width: 200px; /* Adjust the size as needed */
+  height: 200px; /* Adjust the size as needed */
+  border-radius: 20px; /* Adjust the border radius as needed */
+  overflow: hidden;
+  position: relative;
+  background-image: url("/public/icon0.png"); /* Path to your background image */
+  background-size: cover;
   background-position: center;
 }

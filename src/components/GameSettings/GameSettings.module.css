@@ -1,0 +1,41 @@
+.control-panel {
+  display: flex;
+  background: #3000ca; /* Optional: Add background for better visibility */
+  padding: 8px; /* Optional: Add padding */
+  border-radius: 5px; /* Optional: Add border radius */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Optional: Add shadow */
+}
+
+.control-panel button {
+  background-color: #ff8c00; /* Button background color */
+  padding: 0;
+  color: #fff; /* Button text color */
+  border: none; /* Remove border */
+  width: 50px; /* Fixed width */
+  height: 50px; /* Fixed height */
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px; /* Button border radius */
+  cursor: pointer; /* Pointer cursor on hover */
+  font-size: 11px; /* Button font size */
+  font-weight: bold;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: width 0.3s ease-in-out, height 0.3s ease-in-out,
+    font-size 0.3s ease-in-out; /* Add transition for font size */
+}
+
+.control-panel button img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensure the image covers the button area */
+}
+
+.control-panel button:hover {
+  background-color: #0056b3; /* Button background color on hover */
+}
+
+.control-panel button:not(:first-child) {
+  margin-left: 8px; /* Add margin-top to all buttons except the first one */
+}

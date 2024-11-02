@@ -1,38 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Map } from "react-map-gl";
-import {
-  DeckGL,
-  ScatterplotLayer,
-  PolygonLayer,
-  ScenegraphLayer,
-  IconLayer,
-} from "deck.gl";
+import { DeckGL, ScatterplotLayer, PolygonLayer, IconLayer } from "deck.gl";
 import { MaskExtension } from "@deck.gl/extensions";
 import styles from "./MapComponent.module.css";
-import MarkerModal from "../MarkerModal/MarkerModal";
+import mapIcon from "../../images/map-icon.png";
 
 const MapComponent = ({
   initialViewState,
+  viewState,
   data,
   buildings,
   maskData, // Default to sample data if maskData is not provided
   onViewStateChange,
+  markers,
+  openEditModal,
 }) => {
-  const elevationOffset = 100; // Adjust this value to your desired height
+  const elevationOffset = 20; // Adjust this value to your desired height
   const buildingAdjustment = 1.3; // Adjust this value to your desired height
-
-  const [markers, setMarkers] = useState(() => {
-    // Load markers from localStorage if they exist
-    const savedMarkers = localStorage.getItem("markers");
-    return savedMarkers ? JSON.parse(savedMarkers) : [];
-  });
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newMarker, setNewMarker] = useState(null);
-
-  useEffect(() => {
-    // Save markers to localStorage whenever they change
-    localStorage.setItem("markers", JSON.stringify(markers));
-  }, [markers]);
+  const [hoveredMarker, setHoveredMarker] = useState(null);
 
   const scatterplotLayer = new ScatterplotLayer({
     id: "POIs",
@@ -44,7 +29,13 @@ const MapComponent = ({
     pickable: true,
     radiusScale: 10,
     radiusMinPixels: 5,
-    radiusMaxPixels: 100,
+    radiusMaxPixels: 40,
+    onClick: (info) => {
+      openEditModal(info.object); // Pass the entire marker object
+    },
+    onHover: (info) => {
+      setHoveredMarker(info.object);
+    },
   });
 
   const polygonLayer = new PolygonLayer({
@@ -54,12 +45,14 @@ const MapComponent = ({
     getPolygon: (d) => d.polygon,
     getFillColor: [0, 0, 255, 100],
     getLineColor: [0, 0, 0, 255],
-
     getElevation: (d) => d.height * buildingAdjustment,
     pickable: true,
     autoHighlight: true,
     wireframe: true, // This will show the edges of the polygons
     elevationScale: 1, // Adjust this if you need to scale the heights
+    onHover: (info, event) => {
+      doStuff();
+    },
     transitions: {
       getElevation: {
         duration: 1000,
@@ -85,94 +78,60 @@ const MapComponent = ({
     getFillColor: [0, 0, 0, 255],
     operation: "mask",
   });
+  const iconMapping = {
+    marker: { x: 0, y: 0, width: 225, height: 225, anchorY: 225 },
+  };
+  const ICON_URL = mapIcon; // Replace with your desired icon URL
 
-  const iconLayer = new IconLayer({
-    id: "icon-layer",
+  const getIconSize = () => {
+    return Math.max(10, 20 - viewState.zoom); // Example scaling logic
+  };
+
+  const doStuff = (obj) => {
+    console.log("hovered", obj);
+  };
+
+  const markerLayer = new IconLayer({
+    id: "markerLayer",
     data: markers,
-    getPosition: (d) => [d.longitude, d.latitude, d.elevation || 100],
-    getIcon: (d) => ({
-      url: process.env.PUBLIC_URL + "/map-icon.png",
-      width: 128,
-      height: 128,
-      anchorY: 128,
-    }),
-    sizeScale: 85,
     pickable: true,
+    interactive: true, // Disable default hover behavior
+
+    iconAtlas: ICON_URL, // URL to the icon image
+    iconMapping,
+    getIcon: () => "marker",
+    getPosition: (d) => d.position,
+    getSize: () => getIconSize(), // Use size specified in data
+    sizeScale: 10, // Scale factor, adjust as needed
+    elevationScale: 1000, // or any other value
+
+    onClick: (info) => {
+      openEditModal(info.object); // Pass the entire marker object
+    },
+    onHover: (info) => {
+      setHoveredMarker(info.object);
+    },
   });
 
-  const clearMarkers = () => {
-    setMarkers([]);
-  };
-
-  window.clearMarkers = clearMarkers;
-
-  const getTooltip = ({ object }) => {
-    if (!object) {
-      return null;
-    }
-
-    return {
-      html: `
-              <div class="${styles.bname}">
-          <strong>${object.name}</strong><br/>
-          ${
-            object.imageUrl
-              ? `<img src="${object.imageUrl}" alt="${object.name}" style="max-width: 200px; max-height: 200px;"/>`
-              : ""
-          }
-        </div>
-      `,
-    };
-  };
-
-  const handleMapClick = (event) => {
-    console.log(event.coordinate);
-    const [longitude, latitude] = event.coordinate;
-    setNewMarker({ longitude, latitude });
-    setIsModalOpen(true);
-  };
-
-  const handleSaveMarker = ({ name, elevation, image }) => {
-    const reader = new FileReader();
-    reader.onload = (upload) => {
-      const imageUrl = upload.target.result;
-      setMarkers((prevMarkers) => [
-        ...prevMarkers,
-        {
-          id: Date.now(),
-          longitude: newMarker.longitude,
-          latitude: newMarker.latitude,
-          elevation,
-          name,
-          imageUrl,
-        },
-      ]);
-    };
-    if (image) {
-      reader.readAsDataURL(image);
-    } else {
-      setMarkers((prevMarkers) => [
-        ...prevMarkers,
-        {
-          id: Date.now(),
-          longitude: newMarker.longitude,
-          latitude: newMarker.latitude,
-          elevation,
-          name,
-        },
-      ]);
-    }
+  const getCursor = () => {
+    return "pointer";
   };
 
   return (
     <div className={styles.container}>
       <DeckGL
         initialViewState={initialViewState}
-        controller={true}
-        layers={[scatterplotLayer, polygonLayer, maskLayer, iconLayer]}
-        onClick={handleMapClick}
+        controller={{
+          // Custom cursor style to use pointer
+          dragPan: false,
+          dragRotate: false,
+          scrollZoom: true,
+          doubleClickZoom: false,
+          touchRotate: false,
+        }}
+        layers={[scatterplotLayer, polygonLayer, maskLayer, markerLayer]}
         onViewStateChange={onViewStateChange}
-        getTooltip={getTooltip}
+        getCursor={getCursor}
         className={styles["container"]}
       >
         <Map
@@ -180,11 +139,11 @@ const MapComponent = ({
           mapboxAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
         />
       </DeckGL>
-      <MarkerModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={handleSaveMarker}
-      />
+      {hoveredMarker && (
+        <div className={styles.hoveredMarkerInfo}>
+          {JSON.stringify(hoveredMarker)}
+        </div>
+      )}
     </div>
   );
 };
