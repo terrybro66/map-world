@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { Map } from "react-map-gl";
 import { DeckGL, ScatterplotLayer, PolygonLayer, IconLayer } from "deck.gl";
 import { MaskExtension } from "@deck.gl/extensions";
@@ -14,8 +15,9 @@ const MapComponent = ({
   markers,
   openEditModal,
 }) => {
-  const elevationOffset = 0; // Adjust this value to your desired height
+  const elevationOffset = 20; // Adjust this value to your desired height
   const buildingAdjustment = 1.3; // Adjust this value to your desired height
+  const [hoveredMarker, setHoveredMarker] = useState(null);
 
   const scatterplotLayer = new ScatterplotLayer({
     id: "POIs",
@@ -27,7 +29,13 @@ const MapComponent = ({
     pickable: true,
     radiusScale: 10,
     radiusMinPixels: 5,
-    radiusMaxPixels: 100,
+    radiusMaxPixels: 40,
+    onClick: (info) => {
+      openEditModal(info.object); // Pass the entire marker object
+    },
+    onHover: (info) => {
+      setHoveredMarker(info.object);
+    },
   });
 
   const polygonLayer = new PolygonLayer({
@@ -37,12 +45,14 @@ const MapComponent = ({
     getPolygon: (d) => d.polygon,
     getFillColor: [0, 0, 255, 100],
     getLineColor: [0, 0, 0, 255],
-
     getElevation: (d) => d.height * buildingAdjustment,
     pickable: true,
     autoHighlight: true,
     wireframe: true, // This will show the edges of the polygons
     elevationScale: 1, // Adjust this if you need to scale the heights
+    onHover: (info, event) => {
+      doStuff();
+    },
     transitions: {
       getElevation: {
         duration: 1000,
@@ -77,11 +87,15 @@ const MapComponent = ({
     return Math.max(10, 20 - viewState.zoom); // Example scaling logic
   };
 
+  const doStuff = (obj) => {
+    console.log("hovered", obj);
+  };
+
   const markerLayer = new IconLayer({
-    id: "icon-layer",
+    id: "markerLayer",
     data: markers,
     pickable: true,
-    interactive: false, // Disable default hover behavior
+    interactive: true, // Disable default hover behavior
 
     iconAtlas: ICON_URL, // URL to the icon image
     iconMapping,
@@ -89,8 +103,13 @@ const MapComponent = ({
     getPosition: (d) => d.position,
     getSize: () => getIconSize(), // Use size specified in data
     sizeScale: 10, // Scale factor, adjust as needed
+    elevationScale: 1000, // or any other value
+
     onClick: (info) => {
       openEditModal(info.object); // Pass the entire marker object
+    },
+    onHover: (info) => {
+      setHoveredMarker(info.object);
     },
   });
 
@@ -120,6 +139,11 @@ const MapComponent = ({
           mapboxAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
         />
       </DeckGL>
+      {hoveredMarker && (
+        <div className={styles.hoveredMarkerInfo}>
+          {JSON.stringify(hoveredMarker)}
+        </div>
+      )}
     </div>
   );
 };

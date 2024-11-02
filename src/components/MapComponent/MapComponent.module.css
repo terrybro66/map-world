@@ -9,3 +9,22 @@
   transition: transform 0.5s ease-in-out, zoom 0.5s ease-in-out;
   cursor: pointer; /* Ensure cursor is a pointer when over the map container */
 }
+
+.hoveredMarkerInfo {
+  position: absolute;
+  bottom: 50px; /* Adjust as needed */
+  left: 50px; /* Adjust as needed */
+  width: 0;
+  height: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid #000;
+  border-radius: 8px;
+  padding: 10px;
+  overflow: hidden;
+  transition: width 0.5s ease, height 0.5s ease;
+}
+
+.container:hover .hoveredMarkerInfo {
+  width: 400px;
+  height: 300px;
+}

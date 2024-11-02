@@ -296,8 +296,11 @@ const App = () => {
         markers={markers}
         openEditModal={openEditModal}
       />
-      <div className={styles.controlPanelContainer}>
+      <div className={styles.logo}>
         <Logo />
+      </div>
+
+      <div className={styles.controlPanelContainer}>
         <ViewModePanel
           changePitch={changePitch}
           changeZoom={changeZoom}

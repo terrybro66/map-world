@@ -4,7 +4,7 @@ import styles from "./Logo.module.css";
 const Logo = () => {
   return (
     <div className={styles.container}>
-      <div className={styles.logo}></div>
+      <div className={styles.frameContent}></div>
     </div>
   );
 };
