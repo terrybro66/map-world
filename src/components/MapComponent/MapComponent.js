@@ -18,6 +18,10 @@ const MapComponent = ({
   const elevationOffset = 20; // Adjust this value to your desired height
   const buildingAdjustment = 1.3; // Adjust this value to your desired height
   const [hoveredMarker, setHoveredMarker] = useState(null);
+  const [hoveredMarkerPosition, setHoveredMarkerPosition] = useState({
+    x: 0,
+    y: 0,
+  }); // Add this line
 
   const scatterplotLayer = new ScatterplotLayer({
     id: "POIs",
@@ -35,6 +39,7 @@ const MapComponent = ({
     },
     onHover: (info) => {
       setHoveredMarker(info.object);
+      setHoveredMarkerPosition({ x: info.x + 10, y: info.y + 10 }); // Add offset
     },
   });
 
@@ -110,6 +115,7 @@ const MapComponent = ({
     },
     onHover: (info) => {
       setHoveredMarker(info.object);
+      setHoveredMarkerPosition({ x: info.x + 10, y: info.y + 10 }); // Add offset
     },
   });
 
@@ -140,7 +146,13 @@ const MapComponent = ({
         />
       </DeckGL>
       {hoveredMarker && (
-        <div className={styles.hoveredMarkerInfo}>
+        <div
+          className={styles.hoveredMarkerInfo}
+          style={{
+            top: hoveredMarkerPosition.y,
+            left: hoveredMarkerPosition.x,
+          }}
+        >
           {JSON.stringify(hoveredMarker)}
         </div>
       )}
