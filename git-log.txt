@@ -1,0 +1,209 @@
+commit ea2fab4b01c25d83ac1440c6b5c25c0795194184
+Author: sublime66 <terry61@btinternet.com>
+Date:   Sat Nov 2 12:41:33 2024 +0000
+
+    adding offset to onhover behaviour
+
+commit 1bfdd29577e69d02157afa75c82225894efc1675
+Merge: 57efe1a f892629
+Author: terrybro66 <terrybro61@gmail.com>
+Date:   Sat Nov 2 09:47:17 2024 +0000
+
+    Merge pull request #10 from terrybro66/feature/add-marker
+    
+    Feature/add marker
+
+commit f89262945220001bdae9c32ac9000d51e01d8410
+Author: sublime66 <terry61@btinternet.com>
+Date:   Sat Nov 2 09:46:04 2024 +0000
+
+    adding a marker feature
+
+commit f72d60b2bd7c60f3615fca6e3a1acdbf1e770e67
+Author: sublime66 <terry61@btinternet.com>
+Date:   Fri Nov 1 11:27:18 2024 +0000
+
+    adding markers to map
+
+commit 89993897911fb05a632880318aeb9607b8e61556
+Author: sublime66 <terry61@btinternet.com>
+Date:   Thu Oct 31 11:38:58 2024 +0000
+
+    saving progress
+
+commit 57efe1a7fb98194f8ef53b66945f6e5b32c58d04
+Merge: a3110c7 d5a86bc
+Author: terrybro66 <terrybro61@gmail.com>
+Date:   Wed Oct 30 10:26:13 2024 +0000
+
+    Merge pull request #9 from terrybro66/feature/add-logo
+    
+    Feature/add logo
+
+commit d5a86bc234cf7eef500ef9026643bdc280298940
+Author: sublime66 <terry61@btinternet.com>
+Date:   Wed Oct 30 10:15:39 2024 +0000
+
+    adding logo to the map
+
+commit cd483e44a8861e449d606c7d833757fe479cdf8e
+Author: sublime66 <terry61@btinternet.com>
+Date:   Tue Oct 29 18:09:16 2024 +0000
+
+    fixed styling
+
+commit a3110c7a908fa86a96cefe2c166733d301a5d67f
+Author: sublime66 <terry61@btinternet.com>
+Date:   Tue Oct 29 18:04:42 2024 +0000
+
+    removed godzilla
+
+commit 1fccf928a5f8385341c846313f8ec9bd77ef5dfd
+Author: sublime66 <terry61@btinternet.com>
+Date:   Tue Oct 29 18:03:09 2024 +0000
+
+    fixed styling issues
+
+commit def7ac3ef36c6429600b815a09ca38731ffa90de
+Merge: 4a9648f 2714878
+Author: terrybro66 <terrybro61@gmail.com>
+Date:   Mon Oct 28 12:34:19 2024 +0000
+
+    Merge pull request #8 from terrybro66/feature/add-markers
+    
+    adding markers to the map
+
+commit 2714878f3110981a6bbb583faf0c84c3e83bc4c2
+Author: sublime66 <terry61@btinternet.com>
+Date:   Mon Oct 28 12:32:59 2024 +0000
+
+    adding markers to the map
+
+commit 4a9648f49a02656e06142acb22317cc11cd7d78d
+Author: sublime66 <terry61@btinternet.com>
+Date:   Mon Oct 28 10:14:12 2024 +0000
+
+    adding env variables to work in both dev and production
+
+commit ed1173152079f4f70993496b72e31123b36fc3e9
+Merge: 009c252 f84185e
+Author: terrybro66 <terrybro61@gmail.com>
+Date:   Sat Oct 26 19:36:57 2024 +0100
+
+    Merge pull request #7 from terrybro66/feature/search-box
+    
+    adding a search for places of interest
+
+commit f84185ec65c486d6fb03879a9bf914ebcb15f20b
+Author: sublime66 <terry61@btinternet.com>
+Date:   Sat Oct 26 19:36:00 2024 +0100
+
+    adding a search for places of interest
+
+commit 009c252afad83ded44c415fd96e86a99435f3789
+Merge: 3708741 219d6f5
+Author: terrybro66 <terrybro61@gmail.com>
+Date:   Sat Oct 26 13:35:32 2024 +0100
+
+    Merge pull request #6 from terrybro66/feature/move-camera-forward
+    
+    adding camera movement controls
+
+commit 219d6f5285bf0f4a218095d2f74065df2e25ea7a
+Author: sublime66 <terry61@btinternet.com>
+Date:   Sat Oct 26 13:34:35 2024 +0100
+
+    adding camera movement controls
+
+commit 37087419d25ea5062c317e5690c60f6fe2786dbd
+Merge: c17644a 8cee95e
+Author: terrybro66 <terrybro61@gmail.com>
+Date:   Wed Oct 23 09:53:19 2024 +0100
+
+    Merge pull request #5 from terrybro66/feature/rotate-camera
+    
+    adding buttons to rotate the camera view
+
+commit 8cee95edc77771ecbf8595bb622e29cf0294e77c
+Author: sublime66 <terry61@btinternet.com>
+Date:   Wed Oct 23 09:52:25 2024 +0100
+
+    adding buttons to rotate the camera view
+
+commit c17644a39adbca4c478a495c759f8d341f38614a
+Merge: c748dbf f7e335b
+Author: terrybro66 <terrybro61@gmail.com>
+Date:   Wed Oct 23 08:12:04 2024 +0100
+
+    Merge pull request #4 from terrybro66/feature/zoom
+    
+    adding map zoom in and out
+
+commit f7e335b43b288db1c203b60a6e4cf693c3ae8318
+Author: sublime66 <terry61@btinternet.com>
+Date:   Wed Oct 23 08:10:36 2024 +0100
+
+    adding map zoom in and out
+
+commit c748dbf404cebc3fb191b7a8460bdd6b98e03a75
+Merge: decd213 aadfe65
+Author: terrybro66 <terrybro61@gmail.com>
+Date:   Tue Oct 22 16:49:18 2024 +0100
+
+    Merge pull request #3 from terrybro66/feature/view-mode-button
+    
+    Feature/view mode button
+
+commit aadfe65a5f7b8007348bd3419f85dc72c468250b
+Author: sublime66 <terry61@btinternet.com>
+Date:   Tue Oct 22 16:47:32 2024 +0100
+
+    adding a button that switches from plan to perspective view
+
+commit 7772acdcd0fbaf09cfa12fee897b6062782d5667
+Author: sublime66 <terry61@btinternet.com>
+Date:   Sun Oct 20 12:22:26 2024 +0100
+
+    adding interface to change view mode
+
+commit decd21372f0b9157789fcd6aa0d311a610d3f39c
+Merge: d3281b8 a8c82de
+Author: terrybro66 <terrybro61@gmail.com>
+Date:   Fri Oct 18 07:29:10 2024 +0100
+
+    Merge pull request #2 from terrybro66/feature/building-layer
+    
+    adding a building layer with tooltips
+
+commit a8c82de54852839f2e5fb4c285bbeebc199bce8f
+Author: sublime66 <terry61@btinternet.com>
+Date:   Fri Oct 18 07:25:40 2024 +0100
+
+    adding a building layer with tooltips
+
+commit d3281b8fb444bd830682ba6f19a78584db882fe9
+Merge: e54013b 94b674d
+Author: terrybro66 <terrybro61@gmail.com>
+Date:   Wed Oct 16 15:19:04 2024 +0100
+
+    Merge pull request #1 from terrybro66/feature/add-pois
+    
+    adding poi layer
+
+commit 94b674d81e64acf61cad7002a7d7d5710f1c74bd
+Author: sublime66 <terry61@btinternet.com>
+Date:   Wed Oct 16 15:17:59 2024 +0100
+
+    adding poi layer
+
+commit e54013b83c0e72b9d22cc64e85653e066e8df23c
+Author: sublime66 <terry61@btinternet.com>
+Date:   Tue Oct 15 18:33:39 2024 +0100
+
+    tidy code
+
+commit e4bd0a7aab28db029e864219e9995f04d37b55d9
+Author: sublime66 <terry61@btinternet.com>
+Date:   Tue Oct 15 18:20:38 2024 +0100
+
+    Initialize project using Create React App
