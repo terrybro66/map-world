@@ -11,6 +11,7 @@ import ViewModePanel from "./components/ViewModePanel/ViewModePanel";
 import Logo from "./components/Logo/Logo";
 import GameSettings from "./components/GameSettings/GameSettings";
 import Modal from "./components/Modal/Modal";
+import FilterCat from "./components/FilterCat/FilterCat";
 
 const App = () => {
   // State variables
@@ -25,6 +26,15 @@ const App = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editMarker, setEditMarker] = useState(null); // Marker being edited, if any
   const [loaded, setLoaded] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [filteredMarkers, setFilteredMarkers] = useState([]);
+
+  // Load categories on mount
+  useEffect(() => {
+    const loadedCategories = ["Category1", "Category2", "Category3"]; // Example categories
+    setCategories(loadedCategories);
+  }, []);
+
   // Fetch buildings data
   const fetchBuildings = useCallback(async () => {
     try {
@@ -100,7 +110,6 @@ const App = () => {
   // Load markers from local storage on mount
   useEffect(() => {
     const savedMarkers = localStorage.getItem("markers");
-    console.log("Saved Markers from Local Storage:", savedMarkers); // Debugging log
     if (savedMarkers) {
       try {
         const parsedMarkers = JSON.parse(savedMarkers);
@@ -116,9 +125,26 @@ const App = () => {
   useEffect(() => {
     if (loaded) {
       localStorage.setItem("markers", JSON.stringify(markers));
-      console.log("Markers saved to Local Storage:", markers); // Debugging log
     }
   }, [markers, loaded]);
+
+  // Update filtered markers when markers or selected categories change
+  useEffect(() => {
+    setFilteredMarkers(markers);
+  }, [markers]);
+
+  const handleCategoryChange = (selectedCategories) => {
+    if (selectedCategories.length === 0) {
+      setFilteredMarkers(markers);
+    } else {
+      setFilteredMarkers(
+        console.log("Selected Categories:", selectedCategories) || // Debugging log
+          markers.filter((marker) =>
+            selectedCategories.includes(marker.category)
+          )
+      );
+    }
+  };
 
   // Open modal for creating a new marker
   const openCreateModal = () => {
@@ -145,11 +171,12 @@ const App = () => {
   };
 
   // Add a new marker
-  const addMarker = (name, description) => {
+  const addMarker = (name, description, category) => {
     const newMarker = {
       id: generateMarkerId(), // Use the new ID generator
       name: name || "Default Name",
       description: description || "Default Description",
+      category: category || "Default Category",
       position: [viewState.longitude, viewState.latitude],
     };
     setMarkers([...markers, newMarker]);
@@ -157,7 +184,7 @@ const App = () => {
   };
 
   // Update an existing marker
-  const updateMarker = (name, description) => {
+  const updateMarker = (name, description, category) => {
     setMarkers(
       markers.map((marker) =>
         marker.id === editMarker.id
@@ -165,6 +192,7 @@ const App = () => {
               ...marker,
               name: name || "Default Name",
               description: description || "Default Description",
+              category: category || "Default Category",
             }
           : marker
       )
@@ -293,7 +321,7 @@ const App = () => {
         buildings={buildings}
         maskData={maskData}
         onViewStateChange={handleViewStateChange}
-        markers={markers}
+        markers={filteredMarkers} // Use filtered markers
         openEditModal={openEditModal}
       />
       <div className={styles.logo}>
@@ -311,19 +339,22 @@ const App = () => {
         />
         <SearchBox pointsOfInterest={data} flyTo={handleFlyTo} />
         <GameSettings openModal={openCreateModal} />
+        <FilterCat
+          categories={categories}
+          onCategoryChange={handleCategoryChange}
+        />
         {isModalOpen && (
           <Modal
             onClose={closeModal}
             onDelete={deleteMarker}
-            onSave={(name, description) =>
+            onSave={(name, description, category) =>
               editMarker
-                ? updateMarker(name, description)
-                : addMarker(name, description, [
-                    /*default coordinates*/
-                  ])
+                ? updateMarker(name, description, category)
+                : addMarker(name, description, category)
             }
             isEditing={!!editMarker}
             markerData={editMarker} // Pass existing marker data if editing
+            categories={categories} // Pass categories to Modal
           />
         )}
       </div>

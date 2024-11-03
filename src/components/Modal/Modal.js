@@ -1,11 +1,21 @@
 // Modal.js
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import styles from "./Modal.module.css";
 
-const Modal = ({ onClose, onSave, isEditing, markerData, onDelete }) => {
+const Modal = ({
+  onClose,
+  onSave,
+  isEditing,
+  markerData,
+  onDelete,
+  categories,
+}) => {
   const nameRef = useRef();
   const descriptionRef = useRef();
   const idRef = useRef();
+  const [selectedCategory, setSelectedCategory] = useState(
+    isEditing ? markerData.category : ""
+  );
 
   // Populate form fields if editing
   const initialName = isEditing ? markerData.name : "";
@@ -16,7 +26,7 @@ const Modal = ({ onClose, onSave, isEditing, markerData, onDelete }) => {
     const name = nameRef.current.value;
     const description = descriptionRef.current.value;
     const id = idRef.current ? idRef.current.value : null;
-    onSave(name, description, id);
+    onSave(name, description, selectedCategory, id);
   };
 
   const handleDelete = () => {
@@ -41,6 +51,20 @@ const Modal = ({ onClose, onSave, isEditing, markerData, onDelete }) => {
               ref={descriptionRef}
             />
           </label>
+          <div>
+            <label>Category:</label>
+            {categories.map((category) => (
+              <label key={category}>
+                <input
+                  type="radio"
+                  value={category}
+                  checked={selectedCategory === category}
+                  onChange={() => setSelectedCategory(category)}
+                />
+                {category}
+              </label>
+            ))}
+          </div>
           {isEditing && (
             <input type="hidden" defaultValue={markerId} ref={idRef} />
           )}
