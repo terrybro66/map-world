@@ -177,7 +177,7 @@ const App = () => {
       name: name || "Default Name",
       description: description || "Default Description",
       category: category || "Default Category",
-      position: [viewState.longitude, viewState.latitude],
+      coordinates: [viewState.longitude, viewState.latitude], // Use coordinates instead of position
     };
     setMarkers([...markers, newMarker]);
     closeModal();
