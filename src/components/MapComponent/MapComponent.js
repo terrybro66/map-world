@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { Map } from "react-map-gl";
 import { DeckGL, ScatterplotLayer, PolygonLayer, IconLayer } from "deck.gl";
 import { MaskExtension } from "@deck.gl/extensions";
+import { FlyToInterpolator } from "@deck.gl/core"; // Import FlyToInterpolator
 import styles from "./MapComponent.module.css";
 import mapIcon from "../../images/map-icon.png";
+import HoveredMarkerInfo from "../HoveredMarkerInfo/HoveredMarkerInfo"; // Import new component
 
 const MapComponent = ({
   initialViewState,
@@ -21,7 +23,7 @@ const MapComponent = ({
   const [hoveredMarkerPosition, setHoveredMarkerPosition] = useState({
     x: 0,
     y: 0,
-  }); // Add this line
+  });
 
   const scatterplotLayer = new ScatterplotLayer({
     id: "POIs",
@@ -35,11 +37,24 @@ const MapComponent = ({
     radiusMinPixels: 5,
     radiusMaxPixels: 40,
     onClick: (info) => {
-      openEditModal(info.object); // Pass the entire marker object
+      if (info.object) {
+        onViewStateChange({
+          viewState: {
+            ...viewState,
+            longitude: info.object.coordinates[0],
+            latitude: info.object.coordinates[1],
+            zoom: 15,
+            transitionInterpolator: new FlyToInterpolator(),
+            transitionDuration: 2000,
+          },
+        });
+      }
     },
     onHover: (info) => {
-      setHoveredMarker(info.object);
-      setHoveredMarkerPosition({ x: info.x + 10, y: info.y + 10 }); // Add offset
+      if (info.object) {
+        setHoveredMarker(info.object);
+        setHoveredMarkerPosition({ x: info.x + 10, y: info.y + 10 }); // Add offset
+      }
     },
   });
 
@@ -105,17 +120,30 @@ const MapComponent = ({
     iconAtlas: ICON_URL, // URL to the icon image
     iconMapping,
     getIcon: () => "marker",
-    getPosition: (d) => d.position,
+    getPosition: (d) => d.coordinates, // Use coordinates instead of position
     getSize: () => getIconSize(), // Use size specified in data
     sizeScale: 10, // Scale factor, adjust as needed
     elevationScale: 1000, // or any other value
 
     onClick: (info) => {
-      openEditModal(info.object); // Pass the entire marker object
+      if (info.object) {
+        onViewStateChange({
+          viewState: {
+            ...viewState,
+            longitude: info.object.coordinates[0],
+            latitude: info.object.coordinates[1],
+            zoom: 16,
+            transitionInterpolator: new FlyToInterpolator(),
+            transitionDuration: 2000,
+          },
+        });
+      }
     },
     onHover: (info) => {
-      setHoveredMarker(info.object);
-      setHoveredMarkerPosition({ x: info.x + 10, y: info.y + 10 }); // Add offset
+      if (info.object) {
+        setHoveredMarker(info.object);
+        setHoveredMarkerPosition({ x: info.x + 10, y: info.y + 10 }); // Add offset
+      }
     },
   });
 
@@ -146,15 +174,11 @@ const MapComponent = ({
         />
       </DeckGL>
       {hoveredMarker && (
-        <div
-          className={styles.hoveredMarkerInfo}
-          style={{
-            top: hoveredMarkerPosition.y,
-            left: hoveredMarkerPosition.x,
-          }}
-        >
-          {JSON.stringify(hoveredMarker)}
-        </div>
+        <HoveredMarkerInfo
+          marker={hoveredMarker}
+          position={hoveredMarkerPosition}
+          onClose={() => setHoveredMarker(null)} // Pass onClose function
+        />
       )}
     </div>
   );
